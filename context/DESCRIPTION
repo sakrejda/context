@@ -1,0 +1,10 @@
+Package: context
+Type: Package
+Title: Manages metadata about projects composed of code and manuscripts.
+Version: 1.0
+Date: 2015-06-26
+Author: Krzysztof Sakrejda
+Maintainer: Krzysztof Sakrejda <krzysztof.sakrejda@gmail.com>
+Description: Keep a hierarchical definition of project metadata such as libraries used, git hashes, and locations of data/input/output in a single unified JSON file.
+License: GPL-2
+Depends: jsonlite
