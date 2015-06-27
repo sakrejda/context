@@ -1,9 +1,6 @@
 library(context)
-whole_context <- fromJSON(descending_search('context.json'), simplifyVector=FALSE)
-local_context <- find_named_context(whole_context, "wb-ats-data")
-loaded_libraries <- load_libraries(local_context)
-opts <- set_options(context)
-context <- process_context(local_context)
+ordered_contexts <- c('root','R','wb-ats-data')
+context <- process_context(context='context.json', requested=ordered_contexts)
 link <- db_connector(context[['credentials']])
 
 
