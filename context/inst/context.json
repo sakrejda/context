@@ -1,0 +1,42 @@
+[
+  {
+    "type" : "root",
+    "group" : "", 
+    "root" : "/home/krzysiek/",
+    "data_dir" : "data_store",
+    "input_dir" : "input_store",
+    "output_dir" : "output_store",
+    "require" : {
+      "function" : { "name" : "melt", "library" : "reshape2" },
+      "library" : "integrator", 
+      "library" : "GFS", 
+      "library" : "parsestan", 
+      "library" : "magrittr", 
+      "library" : "dplyr", 
+      "library" : "ggplot2", 
+      "library" : "rstan", 
+      "library" : "lubridate", 
+      "library" : "tidyr", 
+      "library" : "gridExtra", 
+      "library" : "Matrix", 
+      "library" : "directlabels", 
+      "library" : "RPostgreSQL"
+    },
+    "options" : {
+      "stringsAsFactors" : false,
+      "check.names" : false,
+      "mc.cores" : 6
+    }
+  },
+  {
+    "type" : "data",
+    "name" : "wb-ats-data",
+    "credentials" : "~/credentials/pgsql-pass-salmonids-local-db.rds",
+    "pipeline_code" : "~/data_management/westbrook/covariate_pipeline/pipeline_code.R"
+  }
+]
+  
+
+
+
+
