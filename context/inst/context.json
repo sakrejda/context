@@ -1,31 +1,17 @@
-[
-  {
-    "name" : "root",
-    "type" : "root",
+{
+  "project::root" : {
     "group" : "", 
-    "root" : "/home/krzysiek/",
+    "root" : "~",
     "data_dir" : "data_store",
     "input_dir" : "input_store",
-    "output_dir" : "output_store"
+    "output_dir" : "output_store",
+    "project_dir" : "projekty"
   },
-  {
-    "type" : "language",
-    "name" : "R",
+  "language::R" : {
     "require" : {
-      "function" : { "name" : "melt", "library" : "reshape2" },
-      "library" : "integrator", 
-      "library" : "GFS", 
-      "library" : "parsestan", 
-      "library" : "magrittr", 
-      "library" : "dplyr", 
-      "library" : "ggplot2", 
-      "library" : "rstan", 
-      "library" : "lubridate", 
-      "library" : "tidyr", 
-      "library" : "gridExtra", 
-      "library" : "Matrix", 
-      "library" : "directlabels", 
-      "library" : "RPostgreSQL"
+      "function" : [ "reshape2:::melt" ],
+      "library" : [ "integrator",  "GFS",  "parsestan",  "magrittr",  "dplyr",  "ggplot2", 
+                    "rstan", "lubridate", "tidyr", "gridExtra", "Matrix", "directlabels", "RPostgreSQL" ]
     },
     "options" : {
       "stringsAsFactors" : false,
@@ -33,13 +19,14 @@
       "mc.cores" : 6
     }
   },
-  {
-    "type" : "data",
-    "name" : "wb-ats-data",
-    "credentials" : "~/credentials/pgsql-pass-salmonids-local-db.rds",
+  "project::wb-ats-data" : {
     "pipeline_code" : "~/data_management/westbrook/covariate_pipeline/pipeline_code.R"
+  },
+  "database::salmonids" : {
+    "driver" : "postgresql",
+    "credentials" : "~/credentials/pgsql-pass-salmonids-local-db.json"
   }
-]
+}
   
 
 

@@ -1,6 +1,4 @@
 proper_context_names <- function(names) grepl(pattern='[A-Za-z\\-]+::[A-Za-z\\-]+', x=names)
-make_key <- function(type, name) paste(type, name, sep='::')
-get_key_components <- function(key) data.frame(key=key) %>% separate(key, c('type','name'), '::', remove=FALSE)
 
 check_context_names <- function(names) {
   if (!all(proper_context_names(names))) {
@@ -16,19 +14,8 @@ check_context_names <- function(names) {
 
 find_contexts <- function(context, requested) {
   check_context_names(requested)
-  context_list <- list()
-  found <- vector()
-  for ( i in seq_along(context)) {
-    type <- context[[i]][['type']]
-    name <- context[[i]][['name']]
-    key <- make_key(type, name)
-    if (key %in% requested) {
-      context_list <- c(context_list,context[i])
-      found <- c(found,key) 
-    }
-    if (all(requested %in% found))  
-      break ## Break when all requested are in context_list.
-  }
+  context_list <- context[names(context) %in% requested]
+  found <- requested[requested %in% names(context_list)]
   if (!all(requested %in% found)) {
     missing_keys <- requested[!(requested %in% found)]
     msg <- paste0(
@@ -58,12 +45,9 @@ find_contexts <- function(context, requested) {
 
 merge_contexts <- function(context_list) {
   data <- new.env()
-  contexts <- list()
-  for ( i in seq_along(context_list)) {
-    contexts[[i]] <- grow_graph(context_list[[i]], data=data)[['graph']]
-  }
+  contexts <- grow_graph(context_list, data=data)[['graph']]
   context <- re_tree(data)
-  context[['graph']] <- do.call(what=igraph:::union, args=contexts)
+  context[['graph']] <- contexts
   return(context)
 }
 
