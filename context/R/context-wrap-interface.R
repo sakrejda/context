@@ -34,6 +34,15 @@ process_context <- function(
   context[['output']] <- file.path(norm_root, context[['output_dir']], group, name) %>% test_normalize_create_dir
   context[['processed_output']] <- file.path(context[['output']], 'processed') %>% test_normalize_create_dir
   context[['graph']] <- context_graph
+
+  if (!is.null(context[['language']][['R']][['options']]))
+    set_options(context[['language']][['R']][['options']])
+  if (!is.null(context[['language']][['R']][['require']][['function']]))
+    define_functions(context[['language']][['R']][['require']][['function']])
+  if (!is.null(context[['language']][['R']][['require']][['library']]))
+    load_libraries(context[['language']][['R']][['require']][['library']])
+
+
   return(context)
 }
 

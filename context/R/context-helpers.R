@@ -8,11 +8,13 @@ load_libraries <- function(libraries) {
 define_functions <- function(functions, envir=.GlobalEnv) {
   have_functions <- rep(FALSE,length(functions))
   names(have_functions) <- functions
+  f_names <- strsplit(functions,':::',fixed=TRUE) %>% sapply(`[[`,2)
+  print(f_names)
   for (i in seq_along(functions)) {
     f <- try(eval(parse(text=functions[i])), silent=TRUE)
     if (class(f) != 'try-error') {
       have_functions[i] <- TRUE
-      assign(x=name, value=f, envir=envir)
+      assign(x=f_names[i], value=f, envir=envir)
     }
   }
   return(have_functions)
