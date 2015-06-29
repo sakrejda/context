@@ -1,14 +1,13 @@
 
 process_context <- function(
-  context='context.json', requested=c('root', 'R'),
-  load_libraries=TRUE, define_functions=TRUE, set_options=TRUE
+  context='context.json', requested=c('project::root', 'language::R')
 ) {
-  whole_context <- fromJSON(descending_search(context), simplifyVector=FALSE)
+  whole_context <- fromJSON(descending_search(context), simplifyVector=TRUE, simplifyDataFrame=FALSE)
   context_list <- find_contexts(whole_context, requested)
-  context <- merge_contexts(context_list)
-  if (load_libraries) load_libraries(context)
-  if (define_functions) define_functions(context)
-  if (set_options) set_options(context)
+  context_data <- merge_contexts(context_list)
+  context <- context_data[['master']]
+  context[['name']] <- context[['name']][length(context[['name']])]
+  context_graph <- context_data[['graph']]
   norm_root <- normalizePath(context[['root']])
   group <- context[['group']]
   name <- context[['name']]
@@ -19,4 +18,6 @@ process_context <- function(
   context[['processed_output']] <- file.path(context[['output']], 'processed') %>% test_normalize_create_dir
   return(context)
 }
+
+
 

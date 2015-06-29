@@ -1,61 +1,85 @@
-find_contexts <- function(context, requested) {
-  found <- list()
-  for ( i in seq_along(context)) {
-    name <- context[[i]][['name']]
-    if (name %in% requested)
-      found[[name]] <- context[[i]]
-    if (all(requested %in% names(found)))  
-      break ## Break when all requested are found.
-  }
-  for ( i in requested) {
-    if (!(i %in% names(found))) {
-      found[[i]] <- NA
-    }
-  }
-  return(found)
-}
-
-merge_contexts <- function(context_list) {
-  context <- NULL
-  for ( name in names(context_list)) {
-    if (is.null(context)) {
-      context <- context_list[[name]]
-    } else {
-      for (section in names(context_list[[name]])) {
-        context[[section]] <- context_list[[name]][[section]]
-      }
-    }
-  }
-  return(context)
-}
-
-load_libraries <- function(context) {
-  if (!has_require_library(context)) return(NULL)
-  required_libraries <- context[['require']][names(context[['require']]) == 'library']
-  have_libraries <- sapply(required_libraries, require, character.only=TRUE)
-  names(have_libraries) <- required_libraries
+load_libraries <- function(libraries) {
+  if (length(libraries) == 0) return(NULL)
+  have_libraries <- sapply(libraries, require, character.only=TRUE)
+  names(have_libraries) <- libraries
   return(have_libraries)
 }
 
-define_functions <- function(context, envir=.GlobalEnv) {
-  if (!has_require_function(context)) return(NULL)
-  required_functions <- context[['require']][names(context[['require']]) == 'function']
-  have_functions <- rep(FALSE,length(required_functions))
-  names(have_functions) <- required_functions
-  for (i in seq_along(required_functions)) {
-    name <- required_functions[[i]][['name']]
-    lib <- required_functions[[i]][['library']]
-    f <- eval(parse(text=paste(lib,name, sep=':::')))
-    assign(x=name, value=f, envir=envir)
-    if (class(f) != 'try-error') have_functions[i] <- TRUE
+define_functions <- function(functions, envir=.GlobalEnv) {
+  have_functions <- rep(FALSE,length(functions))
+  names(have_functions) <- functions
+  for (i in seq_along(functions)) {
+    f <- try(eval(parse(text=functions[i])), silent=TRUE)
+    if (class(f) != 'try-error') {
+      have_functions[i] <- TRUE
+      assign(x=name, value=f, envir=envir)
+    }
   }
   return(have_functions)
 }
 
-set_options <- function(context) {
-  if ('options' %in% names(context)) 
-    do.call(what=options, args=context[['options']])
+set_options <- function(opts) {
+  do.call(what=options, args=opts)
   return(options())
 }
   
+make_db_connections <- function(credentials) {
+  link <- db_connector(credentials)
+}
+
+reconcile_libraries <- function(library_list) {
+  load <- library_list[!grepl('^-',library_list)]
+  drops <- library_list[grepl('^-', library_list)] %>% substr(start=2,stop=nchar(.)-1)
+  do_load <- load[!(load %in% drops)]
+  return(do_load)
+}
+
+reconcile_functions <- reconcile_libraries
+reconcile_options <- function(option_list) return(option_list)
+
+## This is funny.  Do you remember what it does?
+remembrator_factory <- function() {
+  remembrator <- function(f, remember) {
+    if (!is.null(remember)) {
+      for (r in remember) {
+        attempt <- class(try(expr=get(x=r, envir=environment(), inherits=FALSE), silent=TRUE))
+        if (attempt == 'try-error')
+          assign(x=r, value=list(), envir=environment())
+      }
+    }
+    if (is.list(f)) {
+      for ( i in seq_along(f) ) {
+        environment(f[[i]]) <- environment()
+      }
+    } else {
+      environment(f) <- environment()
+    }
+    return(f)
+  }
+  return(remembrator)
+}
+
+language_R_remembrator <- remembrator_factory()
+
+do_language_R <- function(context=NULL, finalize=FALSE) {
+  if (is.null(context) && !isTRUE(finalize)) return()
+  if (!is.null(context)) {
+    new_libraries <- context[['require']][names(context[['require']]) == 'library']
+    library_list <<- c(library_list,new_libraries)
+    new_functions <- context[['require']][names(context[['require']]) == 'function']
+    function_list <<- c(function_list, new_functions)
+    option_list <<- c(option_list, context[['options']])
+  }
+  library_list <<- reconcile_libraries(library_list)
+  function_list <<- reconcile_functions(function_list)
+  option_list <<- reconcile_options(option_list)
+  if (isTRUE(finalize)) {  
+    loaded_libs <- load_libraries(library_list)   
+    defined_functions <- define_functions(function_list)
+    defined_options <- set_options(option_list)
+  }
+}
+
+do_language_R <- language_R_remembrator(f=do_language_R, remember=c('library_list', 'function_list', 'option_list'))
+
 
