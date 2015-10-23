@@ -13,7 +13,7 @@ descending_search <- function (file = "context.json", directory=getwd()) {
     new_directory <- path_split(directory)[[1]]
     nc <- length(new_directory)
     if (nc < 3)          
-      stop("model-data.sh not found.")
+      stop("context not found.")
     new_directory <- do.call(
       what = file.path, 
       args = as.list(new_directory[1:(nc-1)])
