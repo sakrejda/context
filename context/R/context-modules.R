@@ -32,9 +32,9 @@ ALL_project_to_head <- function(context) {
 #'  1) Generate a root level 'data' item with the path to data.
 #'  2) Generate a root level 'input' item with the path to the input.
 #'  3) Generate a root level 'output' item with the path to the output.
-#'  4) Generate a root level 'processed_input' item with a path to data
+#'  4) Generate a root level 'processed-input' item with a path to data
 #'     derived from the input.
-#'  5) Generate a root level 'processed_output' item with a path to data
+#'  5) Generate a root level 'processed-output' item with a path to data
 #'     derived from the output.
 #'
 #' If a 'group' is specified in the context, it is included in the path
@@ -51,9 +51,9 @@ ALL_project_paths <- function(context) {
   name <- names(context[['project']])[names(context[['project']]) != 'root'][1]
   context[['data']] <- file.path(norm_root, context[['data_dir']], group, name) %>% test_normalize_create_dir
   context[['input']] <- file.path(norm_root, context[['input_dir']], group, name) %>% test_normalize_create_dir
-  context[['processed_input']] <- file.path(context[['input']], 'processed') %>% test_normalize_create_dir
+  context[['processed-input']] <- file.path(context[['input']], 'processed') %>% test_normalize_create_dir
   context[['output']] <- file.path(norm_root, context[['output_dir']], group, name) %>% test_normalize_create_dir
-  context[['processed_output']] <- file.path(context[['output']], 'processed') %>% test_normalize_create_dir
+  context[['processed-output']] <- file.path(context[['output']], 'processed') %>% test_normalize_create_dir
   return(context)
 }
 
